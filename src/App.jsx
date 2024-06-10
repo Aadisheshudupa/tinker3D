@@ -10,6 +10,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { useState,useEffect,useRef } from 'react';
 import { saveAs } from 'file-saver';
 import ColorPickerGrid from './ColorPicker.jsx';
+import OrthographicCameraWithHelper  from './OrthographicCameraWithHelper.jsx';
 
 
 // Helper function to fetch file size
@@ -30,12 +31,12 @@ export default function App() {
   return (
     <>
         <ColorPickerGrid setBackgroundColor={setBackgroundColor} setGridColor={setGridColor} gridHelperRef={gridHelperRef} />
-      <Canvas camera={{position: [0, 0, 10]} }>
+      <Canvas camera={{position: [0, 3, 10]} }>
         <ambientLight/>
       <CustomGizmoHelper/>
       <primitive object={gltf.scene}/>
-     <PerspectiveCameraWithHelper position={[5, 4, 15]} far={10}/>
-     <color attach="background" args={[backgroundColor]} />
+     <PerspectiveCameraWithHelper position={[5, 4, 25]} far={10}/>
+     <OrthographicCameraWithHelper position={[0, 0, 5]} far={16} left={-5} right={5} top={5} bottom={-5} />     <color attach="background" args={[backgroundColor]} />
         <gridHelper ref={gridHelperRef} args={[20, 20, gridColor, gridColor]} />
       <Stats/>
       </Canvas>
