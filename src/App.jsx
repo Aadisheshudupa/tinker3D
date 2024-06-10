@@ -1,6 +1,5 @@
 import { Canvas} from '@react-three/fiber'
 import './App.css'
-import { OrbitControls} from '@react-three/drei'
 import CustomGizmoHelper from './CustomGizmoHelper.jsx';
 import PerspectiveCameraWithHelper from './PerspectiveCameraWithHelper.jsx';
 import { useLoader } from '@react-three/fiber'
@@ -8,9 +7,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import  {Stats} from '@react-three/drei'
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
-import { Camera, CameraHelper } from 'three'
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useRef } from 'react';
 import { saveAs } from 'file-saver';
+import ColorPickerGrid from './ColorPicker.jsx';
+
 
 // Helper function to fetch file size
 async function fetchFileSize(url) {
@@ -70,18 +70,28 @@ function Scene({ onModelLoaded }) {
 
 export default function App() {
   const compressedFileName = "model_compressed.glb";
+  const [isDownloaded,setDownload] = useState(true);
+  const [hasDownloaded, setHasDownloaded] = useState(false); // New state to track if download has happened
+  const [backgroundColor, setBackgroundColor] = useState('#3b3b3b');
+  const [gridColor, setGridColor] = useState('#ffffff');
+  const gridHelperRef = useRef(null);
 
   useEffect(() => {
     const originalPath = "/model5.glb"; // Ensure this path is correct and the file is present
-
+    if(isDownloaded)
+      {
     fetchFileSize(originalPath).then(size => {
       if (size !== null) {
         console.log("Original Model Size (bytes): ", size);
       }
     });
+    setDownload(false);
+  }
   }, []);
 
   const handleModelLoaded = async (gltf) => {
+    if (hasDownloaded) return; // Return early if already downloaded
+
     try {
       const compressedBlob = await compressAndExportGLTF(gltf, compressedFileName);
 
@@ -95,21 +105,25 @@ export default function App() {
           compressionLevel: 10
         }
       });
+      setHasDownloaded(true); // Mark as downloaded
+
     } catch (error) {
       console.error("Error during compression and export:", error);
     }
   };
 
-
-    // This exporter function is only because to download the gbl file this is not compulsory it is only to check the compression
+ 
   return (
     <>
-      <Canvas camera={{position: [0, 0, 10]}}>
+        <ColorPickerGrid setBackgroundColor={setBackgroundColor} setGridColor={setGridColor} gridHelperRef={gridHelperRef} />
+      <Canvas camera={{position: [0, 0, 10]} }>
         <ambientLight/>
       <Scene onModelLoaded={handleModelLoaded} />
       <CustomGizmoHelper/>
-        <PerspectiveCameraWithHelper position={[5,6,8]}/>
-        <Stats/>
+     <PerspectiveCameraWithHelper position={[5, 4, 15]} far={10}/>
+     <color attach="background" args={[backgroundColor]} />
+        <gridHelper ref={gridHelperRef} args={[20, 20, gridColor, gridColor]} />
+      <Stats/>
       </Canvas>
     </>
   )
