@@ -174,5 +174,32 @@ button:focus-visible {
   font-family: Helvetica;
   border-radius: 4px;
 }
-
+.sidebar {
+  width: 200px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-left: 1px solid #ccc;
+}
 /* Transparent background for the color picker elements */
+:root {
+  --icon-color-light: #000000; /* black for light mode */
+  --icon-color-dark: #ffffff; /* white for dark mode */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --icon-color: var(--icon-color-dark);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --icon-color: var(--icon-color-light);
+  }
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: var(--icon-color);
+}
